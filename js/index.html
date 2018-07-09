@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+
+  <style type="text/css">
+
+  </style>
+
+</head>
+<body>
+
+<script type="text/javascript">
+      var request = new XMLHttpRequest();
+      request.open('GET', 'https://api.myjson.com/bins/152f9j');
+      request.responseType = 'json';
+      request.onload = function() {
+        processData(request.response.data);
+      };
+      request.send();
+
+      function processData(dataArray) {
+        // console.log(dataArray[0]);
+         let tags = new Set();
+         dataArray.forEach(function (item) {
+            item.description = '';
+            item.tags.forEach(function (tag) {
+              tags.add(tag);
+            });
+         });
+        console.log(tags);
+        // сортуємо по даті
+        sortByDate(dataArray, true);
+        let tagsSet = new Set(['Sport', 'Food']);
+        // фільтруємо за тегами
+        let filteredData = filterByTags(dataArray, tagsSet);
+        console.log(filteredData);
+        //сортуємо за тегами
+        filteredData.sort(tagPriorityComparatorFunc(tagsSet));
+      }
+
+      function sortByDate(dataArray, isAsceding) {
+        return dataArray.sort(dateComparatorFunc(isAsceding));
+      }
+
+      function dateComparatorFunc(isAsceding) {
+        var sign = isAsceding ? 1 : -1;
+        return function (a, b) {
+          return sign * (new Date(b.createdAt) - new Date(a.createdAt));
+        }
+      }
+
+      function tagPriorityComparatorFunc(tagsSet) {
+        return function (a, b) {
+          let aNumOfTags = countContainingTags(a, tagsSet);
+          let bNumOfTags = countContainingTags(b, tagsSet);
+
+          return bNumOfTags - aNumOfTags;
+        }
+      }
+
+      function countContainingTags(data, tagsSet) {
+        let count = 0;
+        data.tags.forEach(function (tag) {
+          if(tagsSet.has(tag)) {
+            count ++;
+          }
+        });
+        return count;
+      }
+
+      // sport, food
+      function filterByTags(dataArray, tagsSet) {
+        let filtered = [];
+        dataArray.forEach(function (item) {
+          for (var i = 0; i < item.tags.length - 1; i++) {
+            if (tagsSet.has(item.tags[i]))
+            {
+              filtered.push(item);
+            }
+          }
+        });
+        return filtered;
+      }
+
+
+
+  </script>
+</body>
+</html>
