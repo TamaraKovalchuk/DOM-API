@@ -11,7 +11,13 @@ body {
 }
 .start{
     position: fixed;
-    margin: 0 0 0 80vw;
+    margin: 43vw 0 0 80vw;
+}
+.date{
+    margin-bottom: 1vw;
+}
+.p{
+    margin-bottom: 1vw;
 }
 i{
     background: white;
@@ -20,24 +26,23 @@ i{
 }
 .date-tags{
     margin: 3vw 0 0 0;
-    max-width: 22vw;
-    max-height: 100vw;
-    width: 10vw;
-    height: 20vw;
+    width: 25vw;
     background: white;
     padding: 0.5vw;
 
 }
+label{
+    font-size: 1vw;
+}
 .container{
     margin: 3vw 2vw 0vw 2vw;
     display: flex;
-    justify-content: space-between;
     flex-wrap: wrap;
 }
 .post{
     width: 15vw;
-    /*max-height: 30vw;*/
     display: flex;
+    align-self: center;
     flex-direction: column;
     background: white;
     padding: 1vw;

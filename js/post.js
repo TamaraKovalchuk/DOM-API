@@ -1,5 +1,7 @@
 var posts;
 var selectedTags = new Set();
+var postsRangeStart = 0;
+var postsRangeEnd = 10;
 
 var request = new XMLHttpRequest();
 request.open('GET', 'https://api.myjson.com/bins/152f9j');
@@ -14,6 +16,9 @@ request.onload = function () {
 
     document.getElementById("rb_asc").onchange = onDateSortingChange(posts);
     document.getElementById("rb_desc").onchange = onDateSortingChange(posts);
+
+    var jumpToTopElement = document.getElementsByClassName('start')[0];
+    jumpToTopElement.onclick = jumpToTop;
 }
 
 
@@ -30,7 +35,8 @@ function createPost(postData, container) {
     img.setAttribute('src', postData.image);
     let date = document.createElement('div')
     date.classList.add("date");
-    date.innerHTML = postData.createdAt;
+    date.innerHTML = new Date(postData.createdAt)
+            .toLocaleString('ua-UA', { timeZone: 'UTC', hour12: false });
     let tags = document.createElement('div')
     tags.classList.add("tags");
 
@@ -86,22 +92,22 @@ function lookupAndCreateTags(dataArray) {
 }
 
 function processData(dataArray, tagsSet) {
-    // сортуємо по даті
+
     sortByDate(dataArray, document.getElementById("rb_asc").checked);
-    // let tagsSet = new Set();//['Sport', 'Food']);
+
     let filteredData;
     if (tagsSet.size > 0) {
-        // фільтруємо за тегами
+
         filteredData = filterByTags(dataArray, tagsSet);
         console.log(filteredData);
-        //сортуємо за тегами
+
         filteredData.sort(tagPriorityComparatorFunc(tagsSet));
     } else {
         filteredData = dataArray;
     }
 
     var postsContainer = document.getElementsByClassName('container')[0];
-    for (var i = 0; i < 10 && i < filteredData.length; i++) {
+    for (var i = postsRangeStart; i < postsRangeEnd && i < filteredData.length; i++) {
         createPost(filteredData[i], postsContainer);
     }
 }
@@ -136,7 +142,6 @@ function countContainingTags(data, tagsSet) {
     return count;
 }
 
-// sport, food
 function filterByTags(dataArray, tagsSet) {
     let filtered = [];
     dataArray.forEach(function (item) {
@@ -170,8 +175,23 @@ function onTagEnableDisable(name, tag, tagSet) {
         } else {
             tagSet.delete(name);
         }
-        console.log(name + ': ' + tag.checked);
         clearPosts();
         processData(posts, selectedTags);
     }
+}
+
+window.onscroll = function() {
+    if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight) {
+        postsRangeStart += 10;
+        postsRangeEnd += 10;
+        processData(posts, selectedTags);
+    }
+}
+
+function jumpToTop() {
+    postsRangeStart = 0;
+    postsRangeEnd = 10;
+    clearPosts();
+    window.scrollBy(0, -document.body.scrollHeight);
+    processData(posts, selectedTags);
 }
